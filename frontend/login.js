@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const username = loginForm.querySelector('input[type="text"]').value.trim();
         const password = loginForm.querySelector('input[type="password"]').value;
         try {
-            const res = await fetch('http://localhost:5000/login', {
+            const res = await fetch('https://yourspet.onrender.com/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Send signup data to backend
         try {
-            const res = await fetch('http://localhost:5000/register', {
+            const res = await fetch('https://yourspet.onrender.com/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, username, password })
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const originalText = sendOtpBtn.textContent;
             sendOtpBtn.textContent = 'Sending...';
             try {
-                const res = await fetch('http://localhost:5000/send-otp', {
+                const res = await fetch('https://yourspet.onrender.com/send-otp', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ email, purpose: 'signup' })
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const username = document.getElementById('signup-username').value.trim();
         const password = document.getElementById('signup-password').value;
         if (!username || !password) return alert('Fill all fields');
-        const res = await fetch('http://localhost:5000/register', {
+        const res = await fetch('https://yourspet.onrender.com/register', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ email, username, password })

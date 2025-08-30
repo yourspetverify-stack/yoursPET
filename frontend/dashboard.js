@@ -16,7 +16,7 @@ function fetchUserData() {
     if (!email) return;
 
     // Fetch username from backend and show in sidebar
-    fetch('http://localhost:5000/get-user', {
+    fetch('https://yourspet.onrender.com/get-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -31,12 +31,12 @@ function fetchUserData() {
 
     // Fetch transactions and budgets in parallel, then render charts
     Promise.all([
-        fetch('http://localhost:5000/get-transactions', {
+        fetch('https://yourspet.onrender.com/get-transactions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
         }).then(res => res.json()),
-        fetch('http://localhost:5000/get-budgets', {
+        fetch('https://yourspet.onrender.com/get-budgets', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
@@ -148,7 +148,7 @@ function saveEditTransaction(transactionId) {
         alert('Fill all fields and make sure you are logged in!');
         return;
     }
-    fetch('http://localhost:5000/edit-transaction', {
+    fetch('https://yourspet.onrender.com/edit-transaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -177,7 +177,7 @@ function saveEditTransaction(transactionId) {
 function deleteTransaction(transactionId) {
     const email = sessionStorage.getItem('user_email');
     if (!email || !transactionId) return;
-    fetch('http://localhost:5000/delete-transaction', {
+    fetch('https://yourspet.onrender.com/delete-transaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, transaction_id: transactionId })
@@ -546,7 +546,7 @@ if (form) {
             alert('Fill all fields and make sure you are logged in!');
             return;
         }
-        fetch('http://localhost:5000/add-transaction', {
+        fetch('https://yourspet.onrender.com/add-transaction', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, type: category, amount: amount, description: desc, date: istDateStr })
@@ -572,21 +572,21 @@ if (budgetForm) {
         const weekly = document.getElementById('weekly-budget').value;
         const promises = [];
         if (annual !== '') {
-            promises.push(fetch('http://localhost:5000/add-budget', {
+            promises.push(fetch('https://yourspet.onrender.com/add-budget', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, name: 'Annual', amount: annual })
             }));
         }
         if (monthly !== '') {
-            promises.push(fetch('http://localhost:5000/add-budget', {
+            promises.push(fetch('https://yourspet.onrender.com/add-budget', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, name: 'Monthly', amount: monthly })
             }));
         }
         if (weekly !== '') {
-            promises.push(fetch('http://localhost:5000/add-budget', {
+            promises.push(fetch('https://yourspet.onrender.com/add-budget', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, name: 'Weekly', amount: weekly })
@@ -733,7 +733,7 @@ function resetBudgetsIfNeeded() {
     // Weekly
     const lastWeeklySet = getLastSet('weekly_budget_set');
     if (!lastWeeklySet || now.getDay() === 1 && now - lastWeeklySet > 6*24*60*60*1000) { // Monday
-        fetch('http://localhost:5000/add-budget', {
+        fetch('https://yourspet.onrender.com/add-budget', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, name: 'Weekly', amount: 0 })
@@ -743,7 +743,7 @@ function resetBudgetsIfNeeded() {
     // Monthly
     const lastMonthlySet = getLastSet('monthly_budget_set');
     if (!lastMonthlySet || (now.getDate() === 1 && (now.getMonth() !== lastMonthlySet.getMonth() || now.getFullYear() !== lastMonthlySet.getFullYear()))) {
-        fetch('http://localhost:5000/add-budget', {
+        fetch('https://yourspet.onrender.com/add-budget', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, name: 'Monthly', amount: 0 })
@@ -753,7 +753,7 @@ function resetBudgetsIfNeeded() {
     // Annual
     const lastAnnualSet = getLastSet('annual_budget_set');
     if (!lastAnnualSet || (now.getMonth() === 0 && now.getDate() === 1 && now.getFullYear() !== lastAnnualSet.getFullYear())) {
-        fetch('http://localhost:5000/add-budget', {
+        fetch('https://yourspet.onrender.com/add-budget', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, name: 'Annual', amount: 0 })

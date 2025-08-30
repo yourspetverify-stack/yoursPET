@@ -1,32 +1,36 @@
 from flask import Flask, request, jsonify, session
 from flask_session import Session
 from flask_cors import CORS
-import psycopg2
+import mysql.connector
 import random
 import smtplib
 from email.mime.text import MIMEText
 import time
 import re
-import os
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 CORS(app)
 
-# PostgreSQL config
+# MySQL config
+MYSQL_HOST = 'localhost'
+MYSQL_USER = 'root'
+MYSQL_PASSWORD = 'nothing'
+MYSQL_DB = 'pet_db'
+
 def get_db():
-    return psycopg2.connect(
-        host=os.environ['DB_HOST'],
-        database=os.environ['DB_NAME'],
-        user=os.environ['DB_USER'],
-        password=os.environ['DB_PASSWORD']
+    return mysql.connector.connect(
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DB
     )
 
 # When you create a cursor, always use buffered=True
 # Example:
 db = get_db()
-cursor = db.cursor()
+cursor = db.cursor(buffered=True)
 
 def init_db():
     db = get_db()
@@ -34,7 +38,7 @@ def init_db():
     # Users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL
@@ -43,7 +47,7 @@ def init_db():
     # Budgets table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS budgets (
-            id SERIAL PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
             name VARCHAR(255) NOT NULL,
             amount DECIMAL(12,2) NOT NULL,
@@ -54,7 +58,7 @@ def init_db():
     # Transactions table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS transactions (
-            id SERIAL PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
             type VARCHAR(50) NOT NULL,
             amount DECIMAL(12,2) NOT NULL,
@@ -66,7 +70,7 @@ def init_db():
     # Reports table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS reports (
-            id SERIAL PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
             title VARCHAR(255) NOT NULL,
             content TEXT,
@@ -77,7 +81,7 @@ def init_db():
     # Notifications table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
-            id SERIAL PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
             message TEXT NOT NULL,
             is_read BOOLEAN DEFAULT FALSE,
@@ -560,6 +564,5 @@ def get_user_id():
         return jsonify(success=True, user_id=user[0])  # Use user[0] instead of user['id']
     return jsonify(success=False)
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)

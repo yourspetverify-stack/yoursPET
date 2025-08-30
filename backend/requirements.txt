@@ -1,5 +1,4 @@
 flask
 flask_session
 flask_cors
-mysql-connector-python
-# psycopg2-binary
+psycopg2-binary

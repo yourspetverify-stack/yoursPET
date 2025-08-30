@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_session import Session
 from flask_cors import CORS
-import mysql.connector
+import psycopg2
 import random
 import smtplib
 from email.mime.text import MIMEText
@@ -14,24 +14,19 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 CORS(app)
 
-# MySQL config
-MYSQL_HOST = 'localhost'
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'nothing'
-MYSQL_DB = 'pet_db'
-
+# PostgreSQL config
 def get_db():
-    return mysql.connector.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DB
+    return psycopg2.connect(
+        host=os.environ['DB_HOST'],
+        database=os.environ['DB_NAME'],
+        user=os.environ['DB_USER'],
+        password=os.environ['DB_PASSWORD']
     )
 
 # When you create a cursor, always use buffered=True
 # Example:
 db = get_db()
-cursor = db.cursor(buffered=True)
+cursor = db.cursor()
 
 def init_db():
     db = get_db()
@@ -39,7 +34,7 @@ def init_db():
     # Users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL
@@ -48,7 +43,7 @@ def init_db():
     # Budgets table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS budgets (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             user_id INT NOT NULL,
             name VARCHAR(255) NOT NULL,
             amount DECIMAL(12,2) NOT NULL,
@@ -59,7 +54,7 @@ def init_db():
     # Transactions table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS transactions (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             user_id INT NOT NULL,
             type VARCHAR(50) NOT NULL,
             amount DECIMAL(12,2) NOT NULL,
@@ -71,7 +66,7 @@ def init_db():
     # Reports table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS reports (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             user_id INT NOT NULL,
             title VARCHAR(255) NOT NULL,
             content TEXT,
@@ -82,7 +77,7 @@ def init_db():
     # Notifications table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             user_id INT NOT NULL,
             message TEXT NOT NULL,
             is_read BOOLEAN DEFAULT FALSE,

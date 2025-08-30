@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, session
 from flask_session import Session
 from flask_cors import CORS
 import psycopg2
+import psycopg2.extras
 import random
 import smtplib
 from email.mime.text import MIMEText
@@ -22,11 +23,6 @@ def get_db():
         password=os.environ['DB_PASSWORD'],
         dbname=os.environ['DB_NAME']
     )
-
-# When you create a cursor, always use buffered=True
-# Example:
-db = get_db()
-cursor = db.cursor()
 
 def init_db():
     db = get_db()
@@ -125,8 +121,7 @@ def get_user_id_by_email(email, cursor=None):
         cursor.close()
         db.close()
     if row:
-        # Works for both tuple and dict cursor
-        return row['id'] if isinstance(row, dict) and 'id' in row else row[0]
+        return row[0]
     return None
 
 # --- OTP Endpoints ---
@@ -139,7 +134,7 @@ def send_otp():
         return jsonify({'success': False, 'message': 'Invalid request'}), 400
 
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute('SELECT username FROM users WHERE email=%s', (email,))
     user = cursor.fetchone()
     cursor.close()
@@ -206,14 +201,13 @@ def login():
     if not username or not password:
         return jsonify({'success': False, 'message': 'Username and password required'}), 400
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute('SELECT id, password, email FROM users WHERE username=%s', (username,))
     user = cursor.fetchone()
     cursor.close()
     db.close()
     if not user or user['password'] != password:
         return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
-    # Store email in session
     session['email'] = user['email']
     return jsonify({'success': True, 'email': user['email']})
 
@@ -225,7 +219,6 @@ def reset_password():
     new_password = data.get('new_password')
     if not email or not new_password:
         return jsonify({'success': False, 'message': 'Email and new password required'}), 400
-    # Password validation (same as signup)
     if (len(new_password) < 8 or
         not re.search(r'[!@#$%^&*(),.?":{}|<>]', new_password) or
         not re.search(r'[a-z]', new_password) or
@@ -262,14 +255,11 @@ def add_budget():
         db.close()
         return jsonify({'success': False, 'message': 'User not found'}), 404
     user_id = user[0]
-    # Check if budget exists for this user and type
     cursor.execute('SELECT id FROM budgets WHERE user_id=%s AND name=%s', (user_id, name))
     budget = cursor.fetchone()
     if budget:
-        # Update existing budget
         cursor.execute('UPDATE budgets SET amount=%s WHERE id=%s', (amount, budget[0]))
     else:
-        # Insert new budget
         cursor.execute('INSERT INTO budgets (user_id, name, amount) VALUES (%s, %s, %s)', (user_id, name, amount))
     db.commit()
     cursor.close()
@@ -312,7 +302,6 @@ def add_transaction():
         db.close()
         return jsonify(success=False, message='Invalid user')
     user_id = user[0]
-    # Use provided date if present, else default
     date = data.get('date')
     if date:
         cursor.execute(
@@ -388,7 +377,7 @@ def get_reports():
     if not user_id:
         return jsonify({'success': False, 'message': 'User not found'}), 404
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute('SELECT id, title, content, created_at FROM reports WHERE user_id=%s', (user_id,))
     reports = cursor.fetchall()
     cursor.close()
@@ -424,7 +413,7 @@ def get_notifications():
     if not user_id:
         return jsonify({'success': False, 'message': 'User not found'}), 404
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute('SELECT id, message, is_read, created_at FROM notifications WHERE user_id=%s', (user_id,))
     notifications = cursor.fetchall()
     cursor.close()
@@ -458,8 +447,7 @@ def dashboard():
     if not user_id:
         return jsonify({'success': False, 'message': 'User not found'}), 404
     db = get_db()
-    cursor = db.cursor(dictionary=True)
-    # Always fetch result after each SELECT before next query
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute('SELECT COUNT(*) AS budget_count FROM budgets WHERE user_id=%s', (user_id,))
     budget_count = cursor.fetchone()['budget_count']
     cursor.execute('SELECT COUNT(*) AS transaction_count FROM transactions WHERE user_id=%s', (user_id,))
@@ -484,7 +472,7 @@ def delete_transaction():
     transaction_id = data.get('transaction_id')
     db = get_db()
     cursor = db.cursor()
-    user_id = get_user_id_by_email(email, cursor)  # Pass cursor here
+    user_id = get_user_id_by_email(email, cursor)
     if not user_id or not transaction_id:
         cursor.close()
         db.close()
@@ -505,7 +493,7 @@ def edit_transaction():
     category = data.get('category')
     db = get_db()
     cursor = db.cursor()
-    user_id = get_user_id_by_email(email, cursor)  # Pass cursor here
+    user_id = get_user_id_by_email(email, cursor)
     if not user_id or not transaction_id or not description or not amount or not category:
         cursor.close()
         db.close()
@@ -537,7 +525,7 @@ def get_user_profile():
     data = request.get_json()
     email = data.get('email')
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute('SELECT username FROM users WHERE email=%s', (email,))
     profile = cursor.fetchone()
     cursor.close()
@@ -551,14 +539,15 @@ def get_user_id():
     data = request.get_json()
     email = data.get('email')
     db = get_db()
-    cursor = db.cursor()  # Remove dictionary=True
+    cursor = db.cursor()
     cursor.execute('SELECT id FROM users WHERE email=%s', (email,))
     user = cursor.fetchone()
     cursor.close()
     db.close()
     if user:
-        return jsonify(success=True, user_id=user[0])  # Use user[0] instead of user['id']
+        return jsonify(success=True, user_id=user[0])
     return jsonify(success=False)
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

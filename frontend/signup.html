@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up - YoursPET</title>
+    <link rel="stylesheet" href="login.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            min-width: 100vw;
+            margin: 0;
+            padding: 0;
+        }
+        .login-bg {
+            min-height: 100vh;
+            min-width: 100vw;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #b5d0ff 0%, #ffe2d1 100%) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .signup-container {
+            background: #fff;
+            border-radius: 28px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            padding: 40px 32px 32px 32px;
+            width: 100%;
+            max-width: 350px; 
+            height: 500px;/* Match login card width */
+            margin: 60px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .hidden { display: none; }
+        .signup-btn, .signup-step-btn {
+            padding: 12px 0;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 18px;
+            margin-bottom: 0;
+            cursor: pointer;
+            background: linear-gradient(90deg, #2ec4ff 0%, #38e49c 100%);
+            transition: background 0.2s;
+        }
+        .signup-btn:active, .signup-step-btn:active {
+            background: linear-gradient(90deg, #38e49c 0%, #2ec4ff 100%);
+        }
+        .signup-form input {
+            margin-bottom: 18px;
+            background: #f7fafd;
+        }
+        .styled-signup-link {
+            width: 100%;
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #2ec4ff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .signup-step-title {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #2e8fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-bg">
+        <div class="signup-container" style="background: rgba(255, 255, 255, 0.15);  
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px 20px 20px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            /* Optional shadow for depth */
+            box-shadow: inset 2px 2px 25px 4px rgba(249, 233, 233, 0.2);"">
+            <form id="signup-form" class="signup-form">
+                <div>
+                    <img src="logo.png" alt="Logo" style="width:130px;height:130px;
+                    opacity: 100%;
+                    background: transparent;object-fit:cover;display:block;" />
+                </div>
+                <div class="signup-step-title" id="signup-step-title"
+                style="margin-top: 10px;">Create Your Account</div>
+                <!-- Step 1: Email -->
+                <div id="signup-step1">
+                    <input id="signup-email" style="padding: 12px 12px; border: rgb(231, 223, 223);
+                    border-style: solid;
+                    border-width: 0.1px; border-radius: 10px; color: #000; font-size: 16px; cursor: pointer; 
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    margin-top:20px;
+                    margin-left: 5px;
+                    transition: background 0.2s; width: 300px; box-shadow: 0 2px 8px rgba(24, 24, 24, 0.03);" type="email" placeholder="Email" required>
+                    <button id="signup-send-otp-btn" type="button" class="signup-btn"
+                        style="margin-top: 20px; width: 100%; max-width: 250px; display: block; margin-left: auto; margin-right: auto;">
+                        Send OTP
+                    </button>
+                </div>
+                <!-- Step 2: OTP -->
+                <div id="signup-step2" class="hidden">
+                    <input id="signup-otp" style="padding: 12px 12px; border: none; border-radius: 10px; color: #000; font-size: 16px; cursor: pointer; 
+                    padding-left: 40px;
+                    padding-right: 40px;
+                    margin-top:20px;
+                    margin-left: -25px;
+                    transition: background 0.2s; max-width: 500px; box-shadow: 0 2px 8px rgba(24, 24, 24, 0.03);" type="text" placeholder="Enter OTP" maxlength="6">
+                    <button id="signup-verify-otp-btn" type="button" class="signup-btn" style="margin-top: 50px;
+                    ">Verify OTP</button>
+                </div>
+                <!-- Step 3: Username & Password -->
+                <div id="signup-step3" class="hidden">
+                    <input id="signup-username" style="padding: 12px 12px; border: none; border-radius: 10px; color: #000; font-size: 16px; cursor: pointer; transition: background 0.2s; width: 100%; margin-top: 10px; 
+                    margin-left: -12px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.03);" type="text" placeholder="Create Username" required>
+                    <!-- Password input with eye toggle -->
+                    <div style="position:relative;width:85%;">
+                        <input id="signup-password"
+                            style="padding: 12px 48px 12px 12px; border: none; border-radius: 10px; color: #000; font-size: 16px; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-left: -12px; margin-top:10px;"
+                            type="password" placeholder="Create Password" required>
+                        <span id="toggle-signup-password"
+                            style="position:absolute;top:35px; right: -20px;transform:translateY(-50%);cursor:pointer;color:#2e8fff;font-weight:600;font-size:15px;user-select:none;">
+                            See
+                        </span>
+                    </div>
+                    <button id="signup-final-btn" type="button" class="signup-btn" style="margin-top:18px;">Create Account</button>
+                </div>
+                <a href="login.html" class="styled-signup-link"
+                style="max-width: 250px;
+                margin-top: 10px;">Back to Login</a>
+            </form>
+        </div>
+    </div>
+    <script>
+    // Step 1: Send OTP
+    document.getElementById('signup-send-otp-btn').onclick = async function() {
+        const email = document.getElementById('signup-email').value.trim();
+        if (!email) return alert('Enter your email');
+        const res = await fetch('http://localhost:5000/send-otp', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, purpose: 'signup' })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert('OTP sent to your email');
+            document.getElementById('signup-step1').classList.add('hidden');
+            document.getElementById('signup-step2').classList.remove('hidden');
+        } else {
+            alert(data.message || 'Failed to send OTP');
+        }
+    };
+
+    // Step 2: Verify OTP
+    document.getElementById('signup-verify-otp-btn').onclick = async function() {
+        const email = document.getElementById('signup-email').value.trim();
+        const otp = document.getElementById('signup-otp').value.trim();
+        if (!otp) return alert('Enter the OTP');
+        const res = await fetch('http://localhost:5000/verify-otp', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, otp })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert('OTP verified. Please create your username and password.');
+            document.getElementById('signup-step2').classList.add('hidden');
+            document.getElementById('signup-step3').classList.remove('hidden');
+        } else {
+            alert(data.message || 'OTP verification failed');
+        }
+    };
+
+    // Step 3: Register
+    document.getElementById('signup-final-btn').onclick = async function() {
+        const email = document.getElementById('signup-email').value.trim();
+        const username = document.getElementById('signup-username').value.trim();
+        const password = document.getElementById('signup-password').value;
+        if (!username || !password) return alert('Fill all fields');
+        const res = await fetch('http://localhost:5000/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert('Account created! Please login.');
+            window.location.href = "login.html";
+        } else {
+            alert(data.message || 'Registration failed');
+        }
+    };
+
+    // Password "See" toggle for signup, only show when input has value
+    (function() {
+        var signupPwd = document.getElementById('signup-password');
+        var signupToggle = document.getElementById('toggle-signup-password');
+        if (signupPwd && signupToggle) {
+            // Initial state
+            signupToggle.style.display = signupPwd.value.length > 0 ? 'inline' : 'none';
+            // Show/hide on input
+            signupPwd.addEventListener('input', function() {
+                signupToggle.style.display = signupPwd.value.length > 0 ? 'inline' : 'none';
+                // Reset to "See" if input is cleared
+                if (signupPwd.value.length === 0) {
+                    signupPwd.type = 'password';
+                    signupToggle.textContent = 'See';
+                }
+            });
+            // Toggle password visibility
+            signupToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (signupPwd.type === 'password') {
+                    signupPwd.type = 'text';
+                    signupToggle.textContent = 'Hide';
+                } else {
+                    signupPwd.type = 'password';
+                    signupToggle.textContent = 'See';
+                }
+            });
+        }
+    })();
+    </script>
+</body>
+</html>
